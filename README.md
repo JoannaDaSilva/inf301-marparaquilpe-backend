@@ -25,7 +25,9 @@ source venv/bin/activate
 
 ### 3. Instala las dependencias
 
+```bash
 pip install -r requirements.txt
+```
 
 ### 4. Obtén el archivo .env
 
