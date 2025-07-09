@@ -1,6 +1,6 @@
 # app/routes/loans.py
 from fastapi import APIRouter, HTTPException, Query
-from app.supabase_client import supabase
+from app.supabase_client import get_supabase
 from app.models.loans import LoanCreate, LoanUpdate
 from datetime import date, timedelta
 from typing import Optional
@@ -10,6 +10,7 @@ router = APIRouter()
 @router.post("")
 def create_loan(loan: LoanCreate):
     try:
+        supabase = get_supabase()
         request_id = str(loan.request_id)
         due_date = loan.due_date or (date.today() + timedelta(days=7))
 
@@ -64,6 +65,7 @@ def create_loan(loan: LoanCreate):
 @router.get("")
 def get_all_loans():
     try:
+        supabase = get_supabase()
         response = supabase.table("loans").select("*").execute()
 
         if not response.data:
@@ -84,6 +86,7 @@ def filter_loans(
     request_id: Optional[str] = Query(None),
 ):
     try:
+        supabase = get_supabase()
         query = supabase.table("loans").select("*")
 
         if user_id:
@@ -110,6 +113,7 @@ def filter_loans(
 @router.patch("/{loan_id}")
 def update_loan(loan_id: str, update_data: LoanUpdate):
     try:
+        supabase = get_supabase()
         if not update_data.due_date and not update_data.status:
             raise HTTPException(status_code=400, detail="Debes enviar al menos 'due_date' o 'status' para actualizar")
 
@@ -135,6 +139,7 @@ def update_loan(loan_id: str, update_data: LoanUpdate):
 @router.delete("/{loan_id}")
 def delete_loan(loan_id: str):
     try:
+        supabase = get_supabase()
         # Verificar que el préstamo existe
         loan_check = supabase.table("loans").select("*").eq("id", loan_id).single().execute()
         if not loan_check.data:
