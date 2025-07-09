@@ -1,6 +1,6 @@
-# app/routes/products.py
+# app/routes/requests.py
 from fastapi import APIRouter, HTTPException
-from app.supabase_client import supabase
+from app.supabase_client import get_supabase
 from app.models.requests import NewRequest, RequestStatusUpdate
 from uuid import UUID
 from fastapi import Path, Query
@@ -11,6 +11,7 @@ router = APIRouter()
 @router.post("")
 def create_request(new_request: NewRequest):
     try:
+        supabase = get_supabase()
         data = new_request.dict()
         data["product_id"] = str(data["product_id"])
         data["user_id"] = str(data["user_id"])
@@ -46,11 +47,12 @@ def create_request(new_request: NewRequest):
     
 @router.put("/{request_id}/status")
 def update_request_status(request_id: str = Path(...), status_update: RequestStatusUpdate = ...):
-    allowed_status = {'pending', 'approved', 'rejected'}
-    if status_update.status not in allowed_status:
-        raise HTTPException(status_code=400, detail="Estado inválido")
-
     try:
+        supabase = get_supabase()
+        allowed_status = {'pending', 'approved', 'rejected'}
+        if status_update.status not in allowed_status:
+            raise HTTPException(status_code=400, detail="Estado inválido")
+
         response = supabase.table("requests").update({"status": status_update.status}).eq("id", request_id).execute()
 
         if not response.data:
@@ -68,6 +70,7 @@ def get_requests_filtered(
     status: str = Query(None)
 ):
     try:
+        supabase = get_supabase()
         query = supabase.table("requests").select("*")
         if user_id:
             query = query.eq("user_id", user_id)
@@ -83,6 +86,7 @@ def get_requests_filtered(
 @router.get("")
 def get_all_requests():
     try:
+        supabase = get_supabase()
         response = supabase.table("requests").select("*").execute()
         return response.data
     except Exception as e:
@@ -91,6 +95,7 @@ def get_all_requests():
 @router.delete("/{request_id}")
 def delete_request(request_id: str = Path(..., description="ID de la solicitud a eliminar")):
     try:
+        supabase = get_supabase()
         response = supabase.table("requests") \
             .delete() \
             .eq("id", request_id) \

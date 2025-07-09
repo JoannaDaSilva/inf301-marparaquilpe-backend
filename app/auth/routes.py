@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from app.supabase_client import supabase
+from app.supabase_client import get_supabase
 
 router = APIRouter()
 
@@ -22,6 +22,7 @@ class UserLogin(BaseModel):
 @router.post("/auth/signup")
 async def sign_up(data: SignupSchema):
     try:
+        supabase = get_supabase()
         result = supabase.auth.sign_up({
             "email": data.email,
             "password": data.password
@@ -39,6 +40,7 @@ async def sign_up(data: SignupSchema):
 @router.post("/login")
 async def sign_in(user: UserLogin):
     try:
+        supabase = get_supabase()
         print("LOGIN ATTEMPT:", user.email)
 
         # Forma más directa de manejar la autenticación
@@ -78,6 +80,7 @@ async def sign_in(user: UserLogin):
 
 @router.post("/signout")
 def sign_out():  # Requiere token válido si se implementa sesión
+    supabase = get_supabase()
     result = supabase.auth.sign_out()
     if result.get("error"):
         raise HTTPException(status_code=400, detail=result["error"]["message"])
