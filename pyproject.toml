@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "marparaquilpe-backend"
+version = "0.1.0"
+dependencies = [
+    "fastapi==0.115.12",
+    "uvicorn==0.34.2",
+    "supabase==2.15.2",
+    "python-dotenv==1.1.0",
+    "PyJWT==2.10.1",
+    "pydantic==2.11.5",
+    "httpx==0.28.1"
+]

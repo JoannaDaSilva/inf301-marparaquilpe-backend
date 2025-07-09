@@ -10,3 +10,6 @@ app.include_router(auth_router, prefix="/auth")
 app.include_router(products_router, prefix="/products")
 app.include_router(requests_router, prefix="/requests")
 app.include_router(loans_router, prefix="/loans")
+
+# For Vercel deployment
+handler = app
